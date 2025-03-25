@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const port = 5000;
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const secretKey = 'clave_secreta'; 
 
 // Middleware
 app.use(cors());
@@ -54,27 +56,74 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { email, contraseña } = req.body;
 
+  // Verificar usuario en la base de datos
   const sql = 'SELECT * FROM usuarios WHERE usu_email = ?';
   db.query(sql, [email], async (err, result) => {
-    if (err) {
-      console.error('Error buscando usuario:', err);
-      return res.status(500).json({ message: 'Error en el servidor' });
-    }
-
-    if (result.length === 0) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (err || result.length === 0) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
     const usuario = result[0];
-
-    // Comparar la contraseña ingresada con el hash almacenado
     const match = await bcrypt.compare(contraseña, usuario.usu_contraseña);
 
     if (match) {
-      res.status(200).json({ message: 'Inicio de sesión exitoso', usuario });
+      // Generar token JWT
+      const token = jwt.sign(
+        { id: usuario.usu_id, rol: usuario.usu_rol },
+        secretKey,
+        { expiresIn: '1h' }
+      );
+
+      res.json({ 
+        message: 'Login exitoso', 
+        token, 
+        usuario: { 
+          id: usuario.usu_id, 
+          nombre: usuario.usu_nombre, 
+          rol: usuario.usu_rol 
+        } 
+      });
     } else {
-      res.status(401).json({ message: 'Contraseña incorrecta' });
+      res.status(401).json({ message: 'Credenciales inválidas' });
     }
+  });
+});
+
+// Obtener todos los proveedores
+app.get('/api/proveedores', (req, res) => {
+  const sql = 'SELECT * FROM proveedores';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+// Crear nuevo proveedor
+app.post('/api/proveedores', (req, res) => {
+  const { nombre_pro, contacto_pro, direccion_pro } = req.body;
+  const sql = 'INSERT INTO proveedores (nombre_pro, contacto_pro, direccion_pro) VALUES (?, ?, ?)';
+  db.query(sql, [nombre_pro, contacto_pro, direccion_pro], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Proveedor creado' });
+  });
+});
+
+// Actualizar proveedor
+app.put('/api/proveedores/:id', (req, res) => {
+  const { nombre_pro, contacto_pro, direccion_pro } = req.body;
+  const sql = 'UPDATE proveedores SET nombre_pro = ?, contacto_pro = ?, direccion_pro = ? WHERE provedor_id = ?';
+  db.query(sql, [nombre_pro, contacto_pro, direccion_pro, req.params.id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Proveedor actualizado' });
+  });
+});
+
+// Eliminar proveedor
+app.delete('/api/proveedores/:id', (req, res) => {
+  const sql = 'DELETE FROM proveedores WHERE provedor_id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Proveedor eliminado' });
   });
 });
 

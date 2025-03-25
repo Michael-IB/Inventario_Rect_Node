@@ -5,6 +5,7 @@ import App from './App';
 import 'admin-lte/dist/css/adminlte.min.css';
 import $ from 'jquery'; // eslint-disable-line no-unused-vars
 import 'admin-lte';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Selecciona el contenedor raíz
 const container = document.getElementById('root');

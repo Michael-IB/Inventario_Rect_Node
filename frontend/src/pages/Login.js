@@ -20,47 +20,28 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
-
+  
       if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Inicio de sesión exitoso',
-          confirmButtonText: 'Aceptar',
-        }).then(() => {
-          // Redirigir al dashboard o página principal
-          navigate('/dashboard');
-        });
+        // Guardar token y datos en localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.usuario));
+        
+        // Redirigir al dashboard
+        navigate('/dashboard');
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: data.message || 'Error en el inicio de sesión',
-          confirmButtonText: 'Aceptar',
-        });
+        Swal.fire('Error', data.message, 'error');
       }
     } catch (error) {
-      console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error en el servidor',
-        confirmButtonText: 'Aceptar',
-      });
+      Swal.fire('Error', 'Error en el servidor', 'error');
     }
   };
-
   return (
     <div className="hold-transition login-page">
       <div className="login-box">
