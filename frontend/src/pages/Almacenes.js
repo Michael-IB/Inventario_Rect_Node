@@ -3,28 +3,27 @@ import Swal from 'sweetalert2';
 import { Table, Button, Form, Modal } from 'react-bootstrap';
 import Layout from '../components/Layout';
 
-const Proveedores = () => {
+const Almacenes = () => {
   // Estados [Mantener igual...]
-  const [proveedores, setProveedores] = useState([]);
+  const [almacenes, setAlmacenes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    nombre_pro: '',
-    contacto_pro: '',
-    direccion_pro: ''
+    nombre_a: '',
+    direccion_a: ''
   });
   const [editId, setEditId] = useState(null);
 
   // Efectos y funciones [Mantener igual...]
-  useEffect(() => { fetchProveedores(); }, []);
+  useEffect(() => { fetchAlmacenes(); }, []);
 
-  const fetchProveedores = async () => {
+  const fetchAlmacenes = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/proveedores');
+      const response = await fetch('http://localhost:5000/api/almacenes');
       const data = await response.json();
-      setProveedores(data);
+      setAlmacenes(data);
     } catch (error) {
       console.error('Error:', error);
-      Swal.fire('Error', 'No se pudieron cargar los proveedores', 'error');
+      Swal.fire('Error', 'No se pudieron cargar los almacenes', 'error');
     }
   };
 
@@ -35,8 +34,8 @@ const Proveedores = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = editId 
-      ? `http://localhost:5000/api/proveedores/${editId}`
-      : 'http://localhost:5000/api/proveedores';
+      ? `http://localhost:5000/api/almacenes/${editId}`
+      : 'http://localhost:5000/api/almacenes';
     const method = editId ? 'PUT' : 'POST';
 
     try {
@@ -47,29 +46,28 @@ const Proveedores = () => {
       });
 
       if (response.ok) {
-        Swal.fire('Éxito', editId ? 'Proveedor actualizado' : 'Proveedor agregado', 'success');
+        Swal.fire('Éxito', editId ? 'Almacen actualizado' : 'Almacen agregado', 'success');
         setShowModal(false);
-        setFormData({ nombre_pro: '', contacto_pro: '', direccion_pro: '' });
-        fetchProveedores();
+        setFormData({ nombre_a: '', direccion_a: '' });
+        fetchAlmacenes();
       }
     } catch (error) {
       Swal.fire('Error', 'Error al guardar', 'error');
     }
   };
 
-  const handleEdit = (proveedor) => {
+  const handleEdit = (almacen) => {
     setFormData({
-      nombre_pro: proveedor.nombre_pro,
-      contacto_pro: proveedor.contacto_pro,
-      direccion_pro: proveedor.direccion_pro
+        nombre_a: almacen.nombre_a,
+      direccion_a: almacen.direccion_a
     });
-    setEditId(proveedor.provedor_id);
+    setEditId(almacen.almacen_id);
     setShowModal(true);
   };
 
   const handleDelete = (id) => {
     Swal.fire({
-      title: '¿Eliminar proveedor?',
+      title: '¿Eliminar Almacen?',
       text: 'Esta acción no se puede deshacer',
       icon: 'warning',
       showCancelButton: true,
@@ -77,12 +75,12 @@ const Proveedores = () => {
       cancelButtonText: 'Cancelar'
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/proveedores/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/almacenes/${id}`, {
           method: 'DELETE'
         });
         if (response.ok) {
-          Swal.fire('Eliminado', 'Proveedor eliminado', 'success');
-          fetchProveedores();
+          Swal.fire('Eliminado', 'Almacen eliminado', 'success');
+          fetchAlmacenes();
         }
       }
     });
@@ -90,12 +88,13 @@ const Proveedores = () => {
 
   return (
     <Layout rol="admin">
-      {/* Contenido principal optimizado para espacio completo */}
+      {}
+      
       <div className="" style={{ minHeight: "" }}>
         <section className="content-header p-3 bg-white">
           <div className="container-fluid">
             <div className="d-flex justify-content-between align-items-center">
-              <h1 className="m-0">Gestión de Proveedores</h1>
+              <h1 className="m-0">Gestión de Almacenes</h1>
               <Button 
                 variant="primary" 
                 onClick={() => { 
@@ -104,7 +103,7 @@ const Proveedores = () => {
                 }}
                 size="sm"
               >
-                <i className="fas fa-plus mr-1"></i> Nuevo Proveedor
+                <i className="fas fa-plus mr-1"></i> Nuevo Almacen
               </Button>
             </div>
           </div>
@@ -115,26 +114,24 @@ const Proveedores = () => {
             <div className="card">
               <div className="card-body p-0">
               <Table striped bordered hover className="m-0">
-  <thead className="bg-dark">
-    <tr>
-      <th style={{ width: '35%' }}>Nombre</th>
-      <th style={{ width: '20%' }}>Contacto</th>
-      <th style={{ width: '35%' }}>Dirección</th>
-      <th style={{ width: '10%' }}>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {proveedores.length > 0 ? (
-      proveedores.map((proveedor) => (
-        <tr key={proveedor.provedor_id}>
-          <td>{proveedor.nombre_pro}</td>
-          <td>{proveedor.contacto_pro}</td>
-          <td>{proveedor.direccion_pro}</td>
+                <thead className="bg-dark">
+                <tr>
+                <th style={{ width: '40%' }}>Nombre</th>
+                <th style={{ width: '40%' }}>Dirección</th>
+                <th style={{ width: '20%' }}>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+    {almacenes.length > 0 ? (
+      almacenes.map((almacen) => (
+        <tr key={almacen.almacen_id}>
+          <td>{almacen.nombre_a}</td>
+          <td>{almacen.direccion_a}</td>
           <td className="text-center">
             <Button 
               variant="outline-warning" 
               size="sm" 
-              onClick={() => handleEdit(proveedor)}
+              onClick={() => handleEdit(almacen)}
               className="mr-1"
               title="Editar"
             >
@@ -143,7 +140,7 @@ const Proveedores = () => {
             <Button 
               variant="outline-danger" 
               size="sm" 
-              onClick={() => handleDelete(proveedor.provedor_id)}
+              onClick={() => handleDelete(almacen.almacen_id)}
               title="Eliminar"
             >
               <i className="fas fa-trash"></i>
@@ -153,8 +150,8 @@ const Proveedores = () => {
       ))
     ) : (
       <tr>
-        <td colSpan="4" className="text-center text-muted py-4">
-          No hay proveedores registrados
+        <td colSpan="3" className="text-center text-muted py-4">
+          No hay almacenes registrados
         </td>
       </tr>
     )}
@@ -169,26 +166,16 @@ const Proveedores = () => {
       {/* Modal del formulario (mantener igual) */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>{editId ? 'Editar' : 'Nuevo'} Proveedor</Modal.Title>
+          <Modal.Title>{editId ? 'Editar' : 'Nuevo'} Almacen</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre del Proveedor</Form.Label>
+              <Form.Label>Nombre del Almacen</Form.Label>
               <Form.Control
                 type="text"
-                name="nombre_pro"
-                value={formData.nombre_pro}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Contacto</Form.Label>
-              <Form.Control
-                type="text"
-                name="contacto_pro"
-                value={formData.contacto_pro}
+                name="nombre_a"
+                value={formData.nombre_a}
                 onChange={handleInputChange}
                 required
               />
@@ -197,8 +184,8 @@ const Proveedores = () => {
               <Form.Label>Dirección</Form.Label>
               <Form.Control
                 type="text"
-                name="direccion_pro"
-                value={formData.direccion_pro}
+                name="direccion_a"
+                value={formData.direccion_a}
                 onChange={handleInputChange}
                 required
               />
@@ -218,4 +205,4 @@ const Proveedores = () => {
   );
 };
 
-export default Proveedores;
+export default Almacenes;

@@ -127,6 +127,45 @@ app.delete('/api/proveedores/:id', (req, res) => {
   });
 });
 
+
+// Obtener todos los Almacenes
+app.get('/api/almacenes', (req, res) => {
+  const sql = 'SELECT * FROM almacen';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+// Crear nuevo Almacen
+app.post('/api/almacenes', (req, res) => {
+  const { nombre_a, direccion_a } = req.body;
+  const sql = 'INSERT INTO almacen (nombre_a, direccion_a) VALUES (?, ?)';
+  db.query(sql, [nombre_a, direccion_a], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Almacen creado' });
+  });
+});
+
+// Actualizar Almacen
+app.put('/api/almacenes/:id', (req, res) => {
+  const { nombre_a, direccion_a } = req.body;
+  const sql = 'UPDATE almacen SET nombre_a = ?, direccion_a = ? WHERE almacen_id = ?';
+  db.query(sql, [nombre_a, direccion_a, req.params.id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Almacen actualizado' });
+  });
+});
+
+// Eliminar Almacen
+app.delete('/api/almacenes/:id', (req, res) => {
+  const sql = 'DELETE FROM almacen WHERE almacen_id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'Almacen eliminado' });
+  });
+});
+
 // Iniciar servidor
 app.listen(port, () => {
   console.log(`Servidor backend corriendo en http://localhost:${port}`);

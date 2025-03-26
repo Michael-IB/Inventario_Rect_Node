@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Proveedores from './pages/Proveedores';
+import Almacenes from './pages/Almacenes';
 
 function App() {
   return (
@@ -14,15 +15,15 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
+        <Route path="/dashboard" element={<ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>
-        } />
+          </ProtectedRoute>} />
         <Route path="/proveedores" element={
           <ProtectedRoute rolRequerido={['admin', 'empleado']}> {}<Proveedores />
-      </ProtectedRoute>
-      }/>
+      </ProtectedRoute>}/>
+      <Route path="/almacenes" element={
+          <ProtectedRoute rolRequerido={['admin', 'empleado']}> {}<Almacenes />
+      </ProtectedRoute>}/>
       </Routes>
     </Router>
   );
